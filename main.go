@@ -3,12 +3,15 @@ package main
 import (
 	"net/http"
 
+	"github.com/joho/godotenv"
 	middleware "kayn.ooo/api/src/Middleware"
 	repository "kayn.ooo/api/src/Repository"
 	router "kayn.ooo/api/src/Router"
 )
 
 func main() {
+	godotenv.Load(".env")
+
 	// Connect to the database
 	repository.Connect()
 
