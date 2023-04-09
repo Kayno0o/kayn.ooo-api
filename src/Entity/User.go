@@ -5,6 +5,11 @@ var Roles = map[string][]string{
 	"ROLE_USER":  {"ROLE_USER"},
 }
 
+type UserRegisterForm struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 type User struct {
 	Model
 	Email    string `json:"email" gorm:"unique;not null"`

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -50,6 +51,7 @@ func Authenticate(email, password string) (*entity.User, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	log.Println(user.Password)
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {

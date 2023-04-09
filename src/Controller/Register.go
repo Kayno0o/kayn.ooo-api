@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"regexp"
 
@@ -14,38 +15,44 @@ import (
 
 func Register(mux *http.ServeMux) {
 	mux.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
-		var user entity.User
+		var form entity.UserRegisterForm
 
-		err := json.NewDecoder(r.Body).Decode(&user)
+		err := json.NewDecoder(r.Body).Decode(&form)
 		if err != nil {
 			middleware.WriteJSON(w, map[string]string{"error": "Invalid JSON", "code": "invalid_json", "status": "400"}, 400)
 			return
 		}
 
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
+		log.Println(hashedPassword, form.Password)
 		if err != nil {
 			middleware.WriteJSON(w, map[string]string{"error": "Internal server error", "code": "internal_server_error", "status": "500"}, 500)
 			return
 		}
 
-		user.Password = string(hashedPassword)
+		form.Password = string(hashedPassword)
 
-		if user.Email == "" || user.Password == "" {
+		if form.Email == "" || form.Password == "" {
 			middleware.WriteJSON(w, map[string]string{"error": "Email and password are required", "code": "invalid_credentials", "status": "400"}, 400)
 			return
 		}
 
+		re := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+		if !re.MatchString(form.Email) {
+			middleware.WriteJSON(w, map[string]string{"error": "Email is invalid", "code": "invalid_credentials", "status": "400"}, 400)
+			return
+		}
+
 		var existingUser entity.User
-		userByEmail := repository.DB.Where("email = ?", user.Email).First(&existingUser)
+		userByEmail := repository.DB.Where("email = ?", form.Email).First(&existingUser)
 		if userByEmail.RowsAffected > 0 {
 			middleware.WriteJSON(w, map[string]string{"error": "Email is already taken", "code": "invalid_credentials", "status": "400"}, 400)
 			return
 		}
 
-		re := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-		if !re.MatchString(user.Email) {
-			middleware.WriteJSON(w, map[string]string{"error": "Email is invalid", "code": "invalid_credentials", "status": "400"}, 400)
-			return
+		user := entity.User{
+			Email:    form.Email,
+			Password: form.Password,
 		}
 
 		result := repository.DB.Create(&user)
