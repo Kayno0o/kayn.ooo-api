@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"regexp"
 
@@ -24,7 +23,6 @@ func Register(mux *http.ServeMux) {
 		}
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
-		log.Println(hashedPassword, form.Password)
 		if err != nil {
 			middleware.WriteJSON(w, map[string]string{"error": "Internal server error", "code": "internal_server_error", "status": "500"}, 500)
 			return
