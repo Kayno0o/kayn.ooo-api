@@ -14,7 +14,7 @@ type User struct {
 	Model
 	Email    string `json:"email" gorm:"unique;not null"`
 	Password string `json:"-" gorm:"not null"`
-	Role     string `json:"-" gorm:"default:ROLE_USER;not null"`
+	Role     string `json:"role" gorm:"default:ROLE_USER;not null"`
 }
 
 func (u *User) HasRole(role string) bool {
