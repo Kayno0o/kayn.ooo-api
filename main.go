@@ -18,8 +18,13 @@ func main() {
 	// Initialize the server's routes
 	router.InitRoutes()
 
-	http.ListenAndServe(":8080",
+	//http.ListenAndServe and log errors
+	err := http.ListenAndServe(":8080",
 		// Log all routes
 		middleware.LogRequest(router.Mux),
 	)
+
+	if err != nil {
+		panic(err)
+	}
 }
