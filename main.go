@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 	middleware "kayn.ooo/api/src/Middleware"
@@ -18,8 +20,8 @@ func main() {
 	// Initialize the server's routes
 	router.InitRoutes()
 
-	//http.ListenAndServe and log errors
-	err := http.ListenAndServe(":8080",
+	log.Println("Listening on port " + os.Getenv("PORT"))
+	err := http.ListenAndServe(":"+os.Getenv("PORT"),
 		// Log all routes
 		middleware.LogRequest(router.Mux),
 	)
