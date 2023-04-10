@@ -82,12 +82,13 @@ func GetUserFromToken(tokenString string) (*entity.User, error) {
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
 		userID := claims.UserID
 
-		user, err := repository.GetUserByID(userID)
+		var user entity.User
+		err := repository.FindByID(userID, &user)
 		if err != nil {
 			return nil, err
 		}
 
-		return user, nil
+		return &user, nil
 	} else {
 		return nil, errors.New("invalid token")
 	}

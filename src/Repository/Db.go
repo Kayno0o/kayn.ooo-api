@@ -20,4 +20,5 @@ func Connect() {
 
 	// Migrate the schema
 	DB.AutoMigrate(&entity.User{})
+	DB.AutoMigrate(&entity.Translation{})
 }
